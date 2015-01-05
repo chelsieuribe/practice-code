@@ -1,0 +1,87 @@
+ArrayList<GravityBall> balls = new ArrayList<GravityBall>();
+//maximum number of balls on screen
+int max = 300;
+PImage court;
+import ddf.minim.*;
+Minim minim;
+AudioPlayer player;
+//size of code display
+void setup() {
+  size(795,548);
+  court = loadImage("court.jpg");
+minim = new Minim(this);
+ player = minim.loadFile("Lil Bow Wow - Basketball.mp3");
+ player.play();
+  //color of balls
+  colorMode(HSB, 250, 200, 50, 250);
+}
+
+//Add balls 
+void draw() {
+  background(court);
+  //how fast color of ball changes
+  fill(frameCount%360, 100, 100); 
+  stroke(frameCount%360, 400, 2000);
+  balls.add(new GravityBall(mouseX, mouseY, random(40, 40)));
+  for (int i = 0; i < balls.size (); i ++) {
+    GravityBall b = balls.get(i);
+    b.display(); //display balls
+    b.move(); //move balls
+  }
+
+  //remove balls when they exceed the maximum
+  if (balls.size() > max) {
+    balls.remove(0);
+  }
+}
+
+//add balls when the mouse moves
+void mouseDragged() {
+  balls.add(new GravityBall(mouseX, mouseY, random(30, 80)));
+}
+
+
+//NEW TAB//
+
+// declare GravityBall variables
+class GravityBall {
+  PVector loc, velo, acc;
+  float size, hue, sat, bright, alpha;
+  PImage bball;
+  
+
+  // initialize GravityBall variables
+  GravityBall(float tempx, float tempy, float tempsize) {
+    size = tempsize;
+    velo = new PVector(random(5), 0);
+    acc = new PVector(0, .1);
+    loc = new PVector(tempx, tempy);
+    hue = random(360);
+    //sat = 50;
+    //bright = 110;
+    //alpha = 60;
+    bball= loadImage("bball.jpg");
+   
+  }
+
+  //what GravityBall does
+
+  void display() {
+    //fill(hue, sat, bright, alpha);
+    image(bball,loc.x, loc.y, size, size);
+    //alpha--;
+  }
+
+  void move() {
+    velo.add(acc);
+    loc.add(velo);
+  }
+
+
+  void collide(GravityBall other) {
+    if (loc.dist(other.loc) < size/2 + other.size/2) {
+      velo = PVector.sub(loc, other.loc);
+      velo.normalize();
+    }
+  }
+}
